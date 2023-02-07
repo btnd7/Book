@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.example.model.Author;
 import org.example.model.Book;
+import org.example.model.BookStore;
 import org.example.model.HibernateContext;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -57,20 +58,43 @@ public class Controller implements AutoCloseable {
         }
     }
 
-    public void updateBook(Long bookId, String newTitle) {
+    public void updateBook(String currentBookTitle, String newTitle, String newISBN) {
         Session session = model.getSession();
         Transaction tx = session.beginTransaction();
         try {
-            Book book = session.get(Book.class, bookId);
-            book.setTitle(newTitle);
-            session.update(book);
-            tx.commit();
-        } catch (Exception e) {
-            System.out.println(e);
-            tx.rollback();
+            Query query = session.createQuery("from Book where title = :currentBookTitle", Book.class);
+            query.setParameter("currentBookTitle", currentBookTitle);
+            Book book = (Book) query.uniqueResult();
+            if (book != null) {
+                book.setTitle(newTitle);
+                book.setISBN(newISBN);
+                session.update(book);
+                tx.commit();
+
+            }
+        } catch(Exception e) {
+                System.out.println(e);
+                tx.rollback();
         }
+
     }
 
+    public void searchBook(Scanner sc) {
+        System.out.println("Enter book title or ISBN: ");
+        String searchQuery = sc.nextLine();
+
+        boolean found = false;
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(searchQuery) || book.getISBN().equalsIgnoreCase(searchQuery)) {
+                System.out.println(book.toString());
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            System.out.println("No book found with the given title or ISBN.");
+        }
+    }
 
     @Override
     public void close() throws Exception {

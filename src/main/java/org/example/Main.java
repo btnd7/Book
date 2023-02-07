@@ -12,8 +12,16 @@ public class Main {
         do {
             switch (option) {
                 case "b" -> controller.addBook();
-                case "u" -> controller.updateBook();
-
+                case "u" -> {
+                    System.out.println("Enter current book title: ");
+                    String currentBookTitle = sc.nextLine();
+                    System.out.println("Enter new title: ");
+                    String newTitle = sc.nextLine();
+                    System.out.println("Enter new ISBN: ");
+                    String newISBN = sc.nextLine();
+                    controller.updateBook(currentBookTitle, newTitle, newISBN);
+                }
+                case "s" -> controller.searchBook(sc);
                 default -> {
                     if (!option.equalsIgnoreCase("ghyt")) {
                         System.out.println("Nem ismert opcio...");
@@ -30,6 +38,7 @@ public class Main {
         System.out.println("=".repeat(30));
         System.out.println("\tUj Konyv Felvetele - (b)");
         System.out.println("\t Konyv Modositasa - (u)");
+        System.out.println("\t Konyv Keresese - (s)");
         System.out.println("\tKilepes - (q)");
         System.out.println("=".repeat(30));
     }
